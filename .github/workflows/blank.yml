@@ -1,36 +1,36 @@
-# This is a basic workflow to help you get started with Actions
+configVersion: 1
+kind: Template
+name: Example Template
+description: A template to clone a GitHub repository.
+labels:
+  - github
+parameters:
+  required:
+    - targetRepoName
+  properties:
+    targetRepoName:
+      title: Repository name to clone to
+      type: string
 
-name: CI
+steps:
+  # see the compass-scaffolder.config.ts to set up Github api token to clone and push repositories
+  - id: cloneRepo
+    name: Clone Repository
+    action: fetch:plain
+    input:
+      url: "https://github.com/atlassian-labs/compass-examples"
+      targetPath: ./compass-examples
 
-# Controls when the workflow will run
-on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  - id: publishRepo
+    name: Publish Repository
+    action: publish:github
+    input:
+      repoUrl: "github.com?owner=<yourOrgName>&repo=${{ parameters.targetRepoName }}"
+      repoVisibility: private
+      sourcePath: ./template-website-simple
 
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
-jobs:
-  # This workflow contains a single job called "build"
-  build:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
-
-      # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
-
-      # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
-        run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+output:
+  links:
+    - url: "https://github.com/<yourOrgName>/${{ parameters.targetRepoName }}"
+      title: "View Cloned Repository"
+      type: "REPOSITORY"
